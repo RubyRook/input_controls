@@ -6,6 +6,7 @@ export 'package:input_controls/input_form/domains/di.input_form.dart';
 export 'package:input_controls/input_form/domains/di.validation.dart';
 export 'package:input_controls/input_form/presentations/custom_input.dart';
 export 'package:input_controls/input_form/presentations/default_style.dart';
+export 'package:input_controls/utils/config.dart';
 
 final class InputGroup {
   InputGroup(Map<String, InputType> inputs){
