@@ -9,12 +9,28 @@ export 'package:input_controls/input_form/presentations/default_style.dart';
 export 'package:input_controls/utils/config.dart';
 
 final class InputGroup {
-  InputGroup(Map<String, InputType> inputs){
-    _inputs = inputs;
+  InputGroup(this.inputs);
+  final Map<String, InputType> inputs;
+
+  final state = GlobalKey<FormState>();
+
+  void dispose() {
+    for (final element in inputs.values) {
+      element.dispose();
+    }
   }
 
-  late Map<String, InputType> _inputs;
-  Map<String, InputType> get inputs => _inputs;
+  void serverValidate(Map<String, dynamic> data) {
+    final keys = inputs.keys;
+
+    for (final entry in data.entries) {
+      if (keys.contains(entry.key)) {
+        inputs[entry.key]!.serverError(entry.value);
+      }
+    }
+
+    state.currentState?.validate();
+  }
 
   /// Get form data.
   Map<String, String> get data {
