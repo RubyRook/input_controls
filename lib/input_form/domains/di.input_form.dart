@@ -48,11 +48,8 @@ T extends InputTypeText
   });
 
   final controller = TextEditingController();
-  ValueNotifier<String?> clientValidate = ValueNotifier(null);
-  ValueNotifier<String?> serverValidate = ValueNotifier(null);
-
-  ValueNotifier<String?> get validate =>
-      serverValidate.value != null ? serverValidate:clientValidate;
+  final validate = ValueNotifier<String?>(null);
+  String? _serverValidate;
 
   InputDecoration get decoration => decorationTextForm.copyWith(
     errorStyle: const TextStyle(fontSize: 0, height: -.1),
@@ -60,22 +57,28 @@ T extends InputTypeText
   );
 
   void clearError () {
-    clientValidate.value = null;
-    serverValidate.value = null;
+    validate.value = null;
+    _serverValidate = null;
+  }
+
+  void serverError (String value) {
+    _serverValidate = value;
+    validate.value = value;
   }
 
   void dispose() {
     controller.dispose();
-    clientValidate.dispose();
-    serverValidate.dispose();
+    validate.dispose();
   }
 
   void onChanged (String? value) {
-    if (serverValidate.value != null) serverValidate.value = null;
+    if (_serverValidate != null) _serverValidate = null;
   }
 
   String? validator (String? value) {
-    if (serverValidate.value != null) return serverValidate.value;
+    // Prevent form clear message when form validate
+    if (_serverValidate != null) return _serverValidate;
+    // Perform validate value
     return _validator(value);
   }
 
@@ -83,11 +86,11 @@ T extends InputTypeText
     final val = Validation.instance.validator(label, value, rules: rules ?? ValidatorRules());
 
     if (val case String message? when message.isNotEmpty) {
-      Future.delayed(Duration.zero, ()=> clientValidate.value = message,);
+      Future.delayed(Duration.zero, ()=> validate.value = message,);
       return '';
     }
 
-    Future.delayed(Duration.zero, ()=> clientValidate.value = null,);
+    Future.delayed(Duration.zero, ()=> validate.value = null,);
     return null;
   }
 }
